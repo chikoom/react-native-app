@@ -1,30 +1,55 @@
-import React from 'react'
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
+import React, { useState } from 'react'
+import { StyleSheet, View, FlatList } from 'react-native'
+
+import ReminderItem from './components/ReminderItem'
+import ReminderInput from './components/ReminderInput'
+
+export interface ReminderItem {
+  key: string
+  value: string
+}
 
 export default function App() {
+  const [reminderList, setReminderList] = useState<ReminderItem[]>([])
+
+  const addReminderHandler = (reminderText: string) => {
+    if (!reminderText) return
+    setReminderList(reminderList => [
+      ...reminderList,
+      { key: Math.random().toString(), value: reminderText }
+    ])
+  }
+
+  const clearListHandler = () => {
+    setReminderList([])
+  }
+
+  const removeReminderItem = (itemKey: string) => {
+    setReminderList(reminderList =>
+      reminderList.filter(reminderItem => reminderItem.key !== itemKey)
+    )
+  }
+
   return (
     <View style={appWrapper}>
-      <View style={topInputWrapper}>
-        <TextInput placeholder='Enter Reminder!' style={topInput} />
-        <Button title='Add' onPress={() => {}} />
-      </View>
-      <View></View>
+      <ReminderInput
+        addReminderHandler={addReminderHandler}
+        clearListHandler={clearListHandler}
+      />
+      <FlatList
+        data={reminderList}
+        renderItem={({ item }) => (
+          <ReminderItem
+            removeReminderItem={removeReminderItem}
+            itemText={item.value}
+            itemKey={item.key}
+          />
+        )}
+      />
     </View>
   )
 }
 
-const { topInput, appWrapper, topInputWrapper } = StyleSheet.create({
-  topInput: {
-    flex: 0.9,
-    padding: 5,
-    borderBottomColor: 'black',
-    borderBottomWidth: 2,
-    marginBottom: 10
-  },
-  topInputWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
+const { appWrapper } = StyleSheet.create({
   appWrapper: { paddingTop: 60, paddingBottom: 30, paddingHorizontal: 20 }
 })
