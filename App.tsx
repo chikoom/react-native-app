@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
-import { StyleSheet, View, FlatList } from 'react-native'
+import { StyleSheet, View, FlatList, Text } from 'react-native'
 
 import ReminderItem from './components/ReminderItem'
 import ReminderInput from './components/ReminderInput'
+import ConfirmationModal from './components/ConfirmationModal'
+import useAsyncStorage from './customHooks/useAsyncStorage'
 
 export interface ReminderItem {
   key: string
@@ -11,6 +13,11 @@ export interface ReminderItem {
 
 export default function App() {
   const [reminderList, setReminderList] = useState<ReminderItem[]>([])
+  const [reminderListA, setReminderListA] = useAsyncStorage('reminderList', [])
+
+  const [selectedItemKey, setSelectedItemKey] = useState('')
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false)
 
   const addReminderHandler = (reminderText: string) => {
     if (!reminderText) return
@@ -20,11 +27,11 @@ export default function App() {
     ])
   }
 
-  const clearListHandler = () => {
+  const deleteAllReminderHandler = () => {
     setReminderList([])
   }
 
-  const removeReminderItem = (itemKey: string) => {
+  const deleteOneReminderHandler = (itemKey: string) => {
     setReminderList(reminderList =>
       reminderList.filter(reminderItem => reminderItem.key !== itemKey)
     )
@@ -32,24 +39,48 @@ export default function App() {
 
   return (
     <View style={appWrapper}>
+      <Text style={mainTitle}>Idan's Tasks List</Text>
       <ReminderInput
         addReminderHandler={addReminderHandler}
-        clearListHandler={clearListHandler}
+        clearListHandler={() => setIsDeleteAllOpen(true)}
       />
       <FlatList
         data={reminderList}
         renderItem={({ item }) => (
           <ReminderItem
-            removeReminderItem={removeReminderItem}
+            setSelectedItemKey={setSelectedItemKey}
+            setIsOpen={setIsDeleteOpen}
             itemText={item.value}
             itemKey={item.key}
           />
         )}
       />
+      <ConfirmationModal
+        title='Delete Reminder?'
+        isOpen={isDeleteOpen}
+        setIsOpen={setIsDeleteOpen}
+        yesCallback={deleteOneReminderHandler}
+        itemKey={selectedItemKey}
+      />
+      <ConfirmationModal
+        title='Delete All Reminders?'
+        isOpen={isDeleteAllOpen}
+        setIsOpen={setIsDeleteAllOpen}
+        yesCallback={deleteAllReminderHandler}
+        itemKey={selectedItemKey}
+      />
     </View>
   )
 }
 
-const { appWrapper } = StyleSheet.create({
-  appWrapper: { paddingTop: 60, paddingBottom: 30, paddingHorizontal: 20 }
+const { appWrapper, mainTitle } = StyleSheet.create({
+  appWrapper: { paddingTop: 60, paddingBottom: 30, paddingHorizontal: 20 },
+  mainTitle: {
+    fontSize: 20,
+    textAlign: 'center',
+    marginBottom: 25,
+    borderBottomWidth: 3,
+    borderBottomColor: '#000',
+    paddingBottom: 5
+  }
 })

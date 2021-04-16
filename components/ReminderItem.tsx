@@ -4,19 +4,22 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 export interface Props {
   itemText: string
   itemKey: string
-  removeReminderItem: (itemKey: string) => void
+  setSelectedItemKey: (itemKey: string) => void
+  setIsOpen: (isOpen: boolean) => void
 }
 
 const ReminderItem: React.FC<Props> = ({
   itemText,
   itemKey,
-  removeReminderItem
+  setSelectedItemKey,
+  setIsOpen
 }) => {
+  const itemPressedHandler = () => {
+    setIsOpen(true)
+    setSelectedItemKey(itemKey)
+  }
   return (
-    <TouchableOpacity
-      activeOpacity={0.5}
-      onPress={removeReminderItem.bind(this, itemKey)}
-    >
+    <TouchableOpacity activeOpacity={0.5} onPress={itemPressedHandler}>
       <View style={reminderItem}>
         <Text>{itemText}</Text>
       </View>
@@ -27,9 +30,8 @@ const ReminderItem: React.FC<Props> = ({
 const { reminderItem } = StyleSheet.create({
   reminderItem: {
     padding: 10,
-    backgroundColor: '#aaa',
     borderColor: '#555',
-    borderWidth: 1,
+    borderBottomWidth: 1,
     marginVertical: 5
   }
 })

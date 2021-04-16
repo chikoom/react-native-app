@@ -12,9 +12,13 @@ const ReminderInput: React.FC<Props> = ({
 }) => {
   const [enteredReminder, setEnteredReminder] = useState<string>('')
 
-  const reminderInputHandler = (enteredText: string) =>
+  const reminderInputHandler = (enteredText: string) => {
     setEnteredReminder(enteredText)
-
+  }
+  const addButtonHandler = () => {
+    addReminderHandler(enteredReminder)
+    setEnteredReminder('')
+  }
   return (
     <View style={topInputWrapper}>
       <TextInput
@@ -23,10 +27,7 @@ const ReminderInput: React.FC<Props> = ({
         style={topInput}
         value={enteredReminder}
       />
-      <Button
-        title='Add'
-        onPress={addReminderHandler.bind(this, enteredReminder)}
-      />
+      <Button title='Add' onPress={addButtonHandler} />
       <Button title='Clear' onPress={clearListHandler} />
     </View>
   )
